@@ -25,11 +25,6 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 
-#ifdef ENABLE_WSTK_LEDS
-#include "LEDWidget.h"
-#include "sl_simple_led_instances.h"
-#endif // ENABLE_WSTK_LEDS
-
 #ifdef DISPLAY_ENABLED
 #include "ThermostatUI.h"
 #include "lcd.h"
@@ -196,7 +191,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     SILABS_LOG("App Task started");
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
         while (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
@@ -243,22 +238,4 @@ void AppTask::UpdateThermoStatUI()
     SILABS_LOG("Thermostat Status - M:%d T:%d'C H:%d'C C:%d'C", TempMgr().GetMode(), TempMgr().GetCurrentTemp(),
                TempMgr().GetHeatingSetPoint(), TempMgr().GetCoolingSetPoint());
 #endif // DISPLAY_ENABLED
-}
-
-void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
-{
-    if (buttonHandle == nullptr)
-    {
-        return;
-    }
-
-    AppEvent aEvent           = {};
-    aEvent.Type               = AppEvent::kEventType_Button;
-    aEvent.ButtonEvent.Action = btnAction;
-
-    if (buttonHandle == APP_FUNCTION_BUTTON)
-    {
-        aEvent.Handler = BaseApplication::ButtonHandler;
-        sAppTask.PostEvent(&aEvent);
-    }
 }
