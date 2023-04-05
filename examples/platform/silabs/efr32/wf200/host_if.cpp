@@ -608,6 +608,7 @@ static void wfx_events_task(void * p_arg)
                 // Enable the power save
                 sl_wfx_set_power_mode(WFM_PM_MODE_DTIM, WFM_PM_POLL_FAST_PS, BEACON_1);
                 sl_wfx_enable_device_power_save();
+                SILABS_LOG("WIFI: Power Save Config Success");
             }
 #endif // SLEEP_ENABLED
         }
